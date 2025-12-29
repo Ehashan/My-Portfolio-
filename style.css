@@ -130,7 +130,7 @@ section {
     object-fit: cover;
     /* Removed clip-path and background shape */
     filter: drop-shadow(0 0 5px var(--second-color));
-    /* Kept a subtle glow on the image itself if desired, or remove if "just image" means NO effects. User said "no need that green color shape", so I'll trust a direct drop-shadow is better or just plain. I'll stick to a nice drop-shadow so it fits the theme without the shape. */
+
 }
 
 .home-img {
