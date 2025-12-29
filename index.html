@@ -7,37 +7,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Portfolio </title>
 
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel=' stylesheet'>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
 
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
 </head>
 
 <body>
     <header class="header">
-        <a href="#" class="logo">My Portfolio</a>
+        <a href="#" class="logo">&lt;Eranda Hashan/&gt;</a>
 
-        <i class='bxr  bx-menu' id="menu-icon"></i>
+        <i class='bx bx-menu' id="menu-icon"></i>
         <nav class="navbar">
             <a href="#home" class="active">Home</a>
-            <a href="#about" class="active">About</a>
+            <a href="#about">About</a>
             <a href="#services">Services</a>
-            <a href="#portfolio">Portfolio</a>
+            <a href="#portfolio">Projects</a>
             <a href="#contact">Contact</a>
+            <a href="assets/Eranda_Hashan_CV.pdf" class="btn"
+                style="padding: .5rem 1.5rem; font-size: 1.5rem; margin-left: 2rem;">Download CV</a>
         </nav>
     </header>
     <section class="home" id="home">
         <div class="home-content">
-            <h3>Hello, I'm</h3>
+            <h3>Hello, It's Me</h3>
             <h1>Eranda Hashan</h1>
-            <h3>And I'm a <span> Frontend Developer </span></h3>
+            <h3>And I'm a <span class="multiple-text"> </span></h3>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
             <div class="social-media">
+
+                <a href="https://lk.linkedin.com/in/eranda-hashan-405438254" aria-label="LinkedIn"><i
+                        class='bx bxl-linkedin'></i></a>
+                <a href="https://github.com/Ehashan" aria-label="GitHub"><i class='bx bxl-github'></i></a>
                 <a href="#" aria-label="Facebook"><i class='bx bxl-facebook'></i></a>
                 <a href="#" aria-label="Instagram"><i class='bx bxl-instagram'></i></a>
-                <a href="#" aria-label="LinkedIn"><i class='bx bxl-linkedin'></i></a>
-                <a href="#" aria-label="GitHub"><i class='bx bxl-github'></i></a>
             </div>
-            <a href="#" class="btn">Download CV</a>
+            <a href="assets/Eranda_Hashan_CV.pdf" class="btn" download>Download CV</a>
+
         </div>
         <div class="home-img">
             <img src="images/my.png" alt="">
@@ -46,31 +54,65 @@
 
     <section class="about" id="about">
         <div class="about-img">
-            <img src="images/my.png" alt="">
+            <img src="images/my23.png" alt="">
         </div>
         <div class="about-content">
             <h2 class="heading">About <span>Me</span></h2>
-            <h3>Frontend Developer</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet
-                consectetur adipisicing elit. Quisquam, quod.</p>
+            <h3>Frontend Developer!</h3>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex delectus iste, aliquid officia quasi aliquam
+                deleniti consequuntur suscipit ducimus tenetur maiores vel commodi veniam ratione! Nisi praesentium
+                delectus fugiat officiis cupiditate in illum, modi unde recusandae, molestiae excepturi voluptatum
+                temporibus.</p>
 
-            <a href="#" class="btn">Read More</a>
+            <div class="skills-container">
+                <!-- Languages -->
+                <div class="skill-box">
+                    <h3><i class='bx bx-code-alt'></i> Languages</h3>
+                    <div class="skill-items">
+                        <span class="skill-item"><i class='bx bxl-html'></i> HTML</span>
+                        <span class="skill-item"><i class='bx bxl-python'></i> Python</span>
+                        <span class="skill-item"><i class='bx bxl-java'></i> Java</span>
+                        <span class="skill-item"><i class='bx bxl-c-plus-plus'></i> C</span>
+                        <span class="skill-item"><i class='bx bxl-javascript'></i> JS</span>
+                    </div>
+                </div>
 
-            <div class="about-details">
-                <div class="box">
-                    <h3> <span> Name : </span> Eranda Hashan </h3>
-                    <> <span> Email : </span>
+                <!-- AI & ML -->
+                <div class="skill-box">
+                    <h3><i class='bx bx-brain'></i> AI & ML</h3>
+                    <div class="skill-items">
+                        <span class="skill-item"><i class='bx bx-cube-alt'></i> TensorFlow</span>
+                        <span class="skill-item"><i class='bx bx-chip'></i> Keras</span>
+                        <span class="skill-item"><i class='bx bx-data'></i> Scikit</span>
+                        <span class="skill-item"><i class='bx bx-table'></i> Pandas</span>
+                    </div>
                 </div>
-                <div class="box">
-                    <h3> <span> Phone : </span> +94 76 123 4567 </h3>
-                    <h3> <span> Age : </span> 22 Years </h3>
+
+                <!-- Web Dev -->
+                <div class="skill-box">
+                    <h3><i class='bx bx-globe'></i> Web Dev</h3>
+                    <div class="skill-items">
+                        <span class="skill-item"><i class='bx bxl-react'></i> React</span>
+                        <span class="skill-item"><i class='bx bxl-nodejs'></i> Node</span>
+                        <span class="skill-item"><i class='bx bxl-nodejs'></i> Express</span>
+                    </div>
                 </div>
-                <div class="box">
-                    <h3> <span> Freelance : </span> Available </h3>
-                    <h3> <span> Address : </span> Colombo, Sri Lanka </h3>
+
+                <!-- Databases & Tools -->
+                <div class="skill-box">
+                    <h3><i class='bx bx-server'></i> DataBases & Tools</h3>
+                    <div class="skill-items">
+                        <span class="skill-item"><i class='bx bxl-mongodb'></i> Mongo</span>
+                        <span class="skill-item"><i class='bx bx-data'></i> MySQL</span>
+                        <span class="skill-item"><i class='bx bxl-git'></i> Git</span>
+                        <span class="skill-item"><i class='bx bxl-firebase'></i> Firebase</span>
+                        <span class="skill-item"><i class='bx bxl-trello'></i> Jira</span>
+                        <span class="skill-item"><i class='bx bxl-figma'></i> Figma</span>
+                        <span class="skill-item"><i class='bx bxl-android'></i> Android Dev</span>
+                    </div>
                 </div>
             </div>
-            <a href="#" class="btn">Download CV</a>
+        </div>
     </section>
 
 
@@ -82,20 +124,17 @@
             <div class="service-box">
                 <i class='bx bxl-dribbble'></i>
                 <h3>Web Design</h3>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                <a href="#" class="btn">Read More</a>
+                <a href="#contact" class="btn">More</a>
             </div>
             <div class="service-box">
                 <i class='bx bxl-android'></i>
                 <h3>App Development</h3>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                <a href="#" class="btn">Read More</a>
+                <a href="#contact" class="btn">More</a>
             </div>
             <div class="service-box">
-                <i class='bx bxl-apple'></i>
-                <h3>IOS Development</h3>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                <a href="#" class="btn">Read More</a>
+                <i class='bx bx-palette'></i>
+                <h3>UI/UX Design</h3>
+                <a href="#contact" class="btn">More</a>
             </div>
         </div>
 
@@ -103,67 +142,128 @@
 
     <section class="portfolio" id="portfolio">
         <h2 class="heading">Latest<span>Projects</span></h2>
+
         <div class="portfolio-container">
-            <div class="portfolio-box">
-                <img src="images/project1.png" alt="">
-                <div class="portfolio-layer">
-                    <h4>Project Title</h4>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                    <a href="#"><i class='bxr  bx-arrow-out-up-right-square'></i> </a>
 
+            <div class="portfolio-box">
+                <h4 class="project-name">My Portfolio</h4>
+                <div class="project-image-wrapper">
+                    <img src="images/portfolio.png" alt="My Portfolio Project">
+                    <div class="portfolio-layer">
+                        <p>A responsive personal portfolio website built using HTML, CSS, and JavaScript, showcasing my
+                            skills, projects, and contact information with smooth animations and an interactive user
+                            interface.</p>
+                    </div>
+                </div>
+                <div class="project-buttons">
+                    <a href="https://github.com/Ehashan/My-Portfolio-" target="_blank" class="project-btn"
+                        aria-label="GitHub Repository">
+                        <i class='bx bxl-github'></i> GitHub
+                    </a>
+                    <a href="https://your-live-site-url.com" target="_blank" class="project-btn" aria-label="Live Demo">
+                        <i class='bx bx-globe'></i> Live Demo
+                    </a>
                 </div>
             </div>
 
             <div class="portfolio-box">
-                <img src="images/project2.png" alt="">
-                <div class="portfolio-layer">
-                    <h4>Project Title</h4>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                    <a href="#"><i class='bxr  bx-arrow-out-up-right-square'></i></a>
-
+                <h4 class="project-name">E-Commerce Platform</h4>
+                <div class="project-image-wrapper">
+                    <img src="images/project2.png" alt="E-Commerce Platform">
+                    <div class="portfolio-layer">
+                        <p>Full-stack e-commerce solution with payment integration and admin dashboard.</p>
+                    </div>
+                </div>
+                <div class="project-buttons">
+                    <a href="#" target="_blank" class="project-btn" aria-label="GitHub Repository">
+                        <i class='bx bxl-github'></i> GitHub
+                    </a>
+                    <a href="#" target="_blank" class="project-btn" aria-label="Live Demo">
+                        <i class='bx bx-globe'></i> Live Demo
+                    </a>
                 </div>
             </div>
 
             <div class="portfolio-box">
-                <img src="images/project3.png" alt="">
-                <div class="portfolio-layer">
-                    <h4>Project Title</h4>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                    <a href="#"><i class='bxr  bx-arrow-out-up-right-square'></i></a>
-
+                <h4 class="project-name">Task Manager App</h4>
+                <div class="project-image-wrapper">
+                    <img src="images/project3.png" alt="Task Manager App">
+                    <div class="portfolio-layer">
+                        <p>Productivity app with drag-and-drop functionality and real-time collaboration.</p>
+                    </div>
+                </div>
+                <div class="project-buttons">
+                    <a href="#" target="_blank" class="project-btn" aria-label="GitHub Repository">
+                        <i class='bx bxl-github'></i> GitHub
+                    </a>
+                    <a href="#" target="_blank" class="project-btn" aria-label="Live Demo">
+                        <i class='bx bx-globe'></i> Live Demo
+                    </a>
                 </div>
             </div>
 
             <div class="portfolio-box">
-                <img src="images/project4.png" alt="">
-                <div class="portfolio-layer">
-                    <h4>Project Title</h4>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                    <a href="#"><i class='bxr  bx-arrow-out-up-right-square'></i></a>
-
+                <h4 class="project-name">Weather Dashboard</h4>
+                <div class="project-image-wrapper">
+                    <img src="images/project4.png" alt="Weather Dashboard">
+                    <div class="portfolio-layer">
+                        <p>Real-time weather application with interactive maps and detailed forecasts.</p>
+                    </div>
+                </div>
+                <div class="project-buttons">
+                    <a href="#" target="_blank" class="project-btn" aria-label="GitHub Repository">
+                        <i class='bx bxl-github'></i> GitHub
+                    </a>
+                    <a href="#" target="_blank" class="project-btn" aria-label="Live Demo">
+                        <i class='bx bx-globe'></i> Live Demo
+                    </a>
                 </div>
             </div>
 
             <div class="portfolio-box">
-                <img src="images/project5.png" alt="">
-                <div class="portfolio-layer">
-                    <h4>Project Title</h4>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                    <a href="#"><i class='bxr  bx-arrow-out-up-right-square'></i></a>
-
+                <h4 class="project-name">Restaurant Management System</h4>
+                <div class="project-image-wrapper">
+                    <img src="images/project5.png" alt="Restaurant Management System">
+                    <div class="portfolio-layer">
+                        <p>A web-based restaurant management system developed usingJavaScript, CSS, and MySQL to manage
+                            menu items, customer orders, and basic restaurant operations through a user-friendly
+                            interface.</p>
+                    </div>
+                </div>
+                <div class="project-buttons">
+                    <a href="https://github.com/Ehashan/Restaurant" target="_blank" class="project-btn"
+                        aria-label="GitHub Repository">
+                        <i class='bx bxl-github'></i> GitHub
+                    </a>
+                    <a href="#" target="_blank" class="project-btn" aria-label="Live Demo">
+                        <i class='bx bx-globe'></i> Live Demo
+                    </a>
                 </div>
             </div>
 
             <div class="portfolio-box">
-                <img src="images/project6.png" alt="">
-                <div class="portfolio-layer">
-                    <h4>Project Title</h4>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p>
-                    <a href="#"><i class='bxr  bx-arrow-out-up-right-square'></i></a>
-
+                <h4 class="project-name">Library Management System</h4>
+                <div class="project-image-wrapper">
+                    <img src="images/library_ms.png" alt="Library Management System">
+                    <div class="portfolio-layer">
+                        <p>A desktop-based library management system developed using Java (NetBeans) and MySQL,
+                            implementing CRUD operations to manage books, members, and borrowing records efficiently.
+                        </p>
+                    </div>
                 </div>
-            </div>
+                <div class="project-buttons">
+                    <a href="https://github.com/Ehashan/ITBIIN_2211_0192" target="_blank" class="project-btn"
+                        aria-label="GitHub Repository">
+                        <i class='bx bxl-github'></i> GitHub
+                    </a>
+                    <a href="https://www.youtube.com/watch?v=hPyvjUK1dis" target="_blank" class="project-btn"
+                        aria-label="Live Demo">
+                        <i class='bx bx-globe'></i> Live Demo
+                    </a>
+                </div>
 
+
+            </div>
 
         </div>
     </section>
@@ -171,20 +271,23 @@
     <section class="contact" id="contact">
         <h2 class="heading">Contact <span>Me!</span></h2>
 
-        <from action="#">
+        <form id="contact-form">
             <div class="input-box">
-                <input type="text" placeholder="Full Name">
-                <input type="email" placeholder="Email Address">
+                <input type="text" name="name" placeholder="Full Name" required>
+                <input type="email" name="email" placeholder="Email Address" required>
             </div>
+
             <div class="input-box">
-                <input type="number" placeholder="Mobile Number">
-                <input type="email" placeholder="Subject">
+                <input type="text" name="phone" placeholder="Mobile Number">
+                <input type="text" name="subject" placeholder="Subject">
             </div>
-            <textarea name="" id="" cols="30" rows="10" placeholder="Your Message"></textarea>
+
+            <textarea name="message" cols="30" rows="10" placeholder="Your Message" required></textarea>
+
             <input type="submit" value="Send Message" class="btn">
-        </from>
-       
+        </form>
     </section>
+
 
     <footer class="footer">
         <div class="footer-class">
@@ -196,6 +299,9 @@
 
     </footer>
 
+    <script src="https://unpkg.com/scrollreveal"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 
     <script src="script.js"></script>
 
