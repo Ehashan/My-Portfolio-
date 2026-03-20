@@ -332,7 +332,7 @@ span {
 }
 
 /* Mobile responsive for skills */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .skills-container {
         grid-template-columns: 1fr;
     }
