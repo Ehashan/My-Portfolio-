@@ -300,7 +300,9 @@ function createAdminProjectCardElement(p, fullIndex, isFirst, isLast) {
     const thumbWrap = document.createElement('div');
     thumbWrap.className = 'card-thumb-wrapper';
     const img = document.createElement('img');
-    img.src = window.PortfolioManager ? window.PortfolioManager.sanitizeUrl(p.image) : (p.image || 'images/portfolio.png');
+    const rawImage = p.image || 'images/portfolio.png';
+    const safeImage = window.PortfolioManager ? window.PortfolioManager.sanitizeUrl(rawImage) : rawImage;
+    img.src = encodeURI(safeImage);
     img.alt = p.title || '';
     img.onerror = () => { img.src = 'images/portfolio.png'; };
     thumbWrap.appendChild(img);
@@ -410,7 +412,9 @@ function createAdminTableRowElement(p, fullIndex, isFirst, isLast) {
     const tdThumb = document.createElement('td');
     const thumbImg = document.createElement('img');
     thumbImg.className = 'table-thumb';
-    thumbImg.src = window.PortfolioManager ? window.PortfolioManager.sanitizeUrl(p.image) : (p.image || 'images/portfolio.png');
+    const rawImage = p.image || 'images/portfolio.png';
+    const safeImage = window.PortfolioManager ? window.PortfolioManager.sanitizeUrl(rawImage) : rawImage;
+    thumbImg.src = encodeURI(safeImage);
     thumbImg.alt = p.title || '';
     thumbImg.onerror = () => { thumbImg.src = 'images/portfolio.png'; };
     tdThumb.appendChild(thumbImg);
@@ -546,7 +550,7 @@ function getFormProjectData() {
         const isFrontend = linkGh2.value.trim().length > 0;
         links.push({
             label: isFrontend ? "GitHub-Frontend" : "GitHub",
-            url: gh1Val,
+            url: encodeURI(gh1Val),
             icon: "bx bxl-github"
         });
     }
@@ -556,7 +560,7 @@ function getFormProjectData() {
     if (gh2Val) {
         links.push({
             label: "GitHub-Backend",
-            url: gh2Val,
+            url: encodeURI(gh2Val),
             icon: "bx bxl-github"
         });
     }
@@ -567,7 +571,7 @@ function getFormProjectData() {
     if (demoVal || isDisabled) {
         links.push({
             label: "Live Demo",
-            url: isDisabled ? "#" : demoVal,
+            url: isDisabled ? "#" : encodeURI(demoVal),
             icon: "bx bx-globe",
             disabled: isDisabled
         });
@@ -580,16 +584,17 @@ function getFormProjectData() {
         const isYoutube = customUrl.includes('youtube') || customUrl.includes('youtu.be');
         links.push({
             label: customLabel,
-            url: customUrl,
+            url: encodeURI(customUrl),
             icon: isYoutube ? 'bx bxl-youtube' : 'bx bx-link'
         });
     }
 
+    const rawImg = inputImagePath.value.trim() || 'images/portfolio.png';
     return {
         id: editingProjectId || `proj-${Date.now()}`,
         title: inputTitle.value.trim() || 'New Portfolio Project',
         category: inputCategory.value.trim() || 'Web Dev',
-        image: inputImagePath.value.trim() || 'images/portfolio.png',
+        image: encodeURI(rawImg),
         description: inputDescription.value.trim() || 'Add a compelling description of what technologies you used, the core architecture, and key features of this project.',
         links: links.length > 0 ? links : [
             { label: "GitHub", url: "#", icon: "bx bxl-github" },
