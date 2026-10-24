@@ -1,0 +1,56 @@
+# ==========================================
+# Git Ignore for Portfolio Website
+# ==========================================
+
+# Operating System Files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+*~
+
+# IDE & Code Editor Settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+
+# Environment Variables & Sensitive Files (Safety Precaution)
+.env
+.env.*
+*.env
+*.pem
+*.key
+
+# Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Node Modules (if any build tools or packages are installed later)
+node_modules/
+
+# ==========================================
+# Optional: Keep Admin Panel Local Only
+# ==========================================
+# If you ever want the Admin Panel to run ONLY on your local computer
+# and NEVER be uploaded to GitHub, uncomment the lines below:
+# admin.html
+# admin.js
+# admin.css

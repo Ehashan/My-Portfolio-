@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Eranda Hashan Portfolio</title>
+    
+    <!-- Boxicons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+    <!-- Custom Admin Styles -->
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- ----------------- SECURITY PIN ACCESS GATE ----------------- -->
+    <div id="auth-gate">
+        <div class="auth-card">
+            <div class="auth-icon">
+                <i class='bx bx-shield-quarter'></i>
+            </div>
+            <h2>Admin Portal</h2>
+            <p>Enter your passcode to manage and publish portfolio projects.</p>
+            
+            <div class="auth-form">
+                <input type="password" id="auth-pin" placeholder="••••••••" maxlength="40" autofocus autocomplete="off">
+                <button type="button" id="btn-login">
+                    <i class='bx bx-log-in-circle'></i> Unlock Dashboard
+                </button>
+            </div>
+            <div class="auth-hint">
+                <i class='bx bx-shield'></i> Protected with SHA-256 cryptographic verification
+            </div>
+        </div>
+    </div>
+
+    <!-- ----------------- ADMIN NAVBAR ----------------- -->
+    <nav class="admin-navbar">
+        <div class="nav-brand">
+            <a href="#" class="brand-logo">&lt;Eranda Hashan/&gt; <span>Admin</span></a>
+            <span class="badge-dev"><i class='bx bx-git-branch'></i> dev branch</span>
+        </div>
+
+        <div class="nav-actions">
+            <a href="index.html" target="_blank" class="btn-nav btn-nav-outline" title="Open Public Portfolio in new tab">
+                <i class='bx bx-link-external'></i> View Portfolio
+            </a>
+            <button class="btn-nav btn-nav-outline" onclick="openExportModal()" title="Export or Sync Code">
+                <i class='bx bx-export'></i> Export &amp; Sync
+            </button>
+            <button class="btn-icon" onclick="openSettingsModal()" title="Admin Settings">
+                <i class='bx bx-cog'></i>
+            </button>
+            <button class="btn-icon" id="btn-logout" title="Lock / Logout">
+                <i class='bx bx-log-out'></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ----------------- MAIN ADMIN CONTAINER ----------------- -->
+    <main class="admin-container">
+        
+        <!-- Stats Metrics -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class='bx bx-folder'></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="stat-total">0</h3>
+                    <p>Total Projects</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class='bx bx-category-alt'></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="stat-categories">0</h3>
+                    <p>Categories</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class='bx bx-globe'></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="stat-demos">0</h3>
+                    <p>Live Demos Online</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class='bx bxl-github'></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="stat-repos">0</h3>
+                    <p>GitHub Repositories</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Toolbar -->
+        <section class="toolbar-card">
+            <div class="search-filter-group">
+                <div class="search-input-box">
+                    <i class='bx bx-search'></i>
+                    <input type="text" id="search-input" placeholder="Search projects by title, tech...">
+                </div>
+
+                <select id="category-filter" class="select-category">
+                    <option value="all">All Categories</option>
+                </select>
+
+                <div class="view-mode-toggle">
+                    <button class="view-btn active" id="view-grid-btn" title="Grid View">
+                        <i class='bx bx-grid-alt'></i>
+                    </button>
+                    <button class="view-btn" id="view-table-btn" title="Table View">
+                        <i class='bx bx-list-ul'></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="toolbar-buttons">
+                <button class="btn-secondary" onclick="handleResetDefaults()" title="Restore default projects">
+                    <i class='bx bx-reset'></i> Reset Defaults
+                </button>
+                <button class="btn-primary" onclick="openAddModal()">
+                    <i class='bx bx-plus-circle'></i> Add New Project
+                </button>
+            </div>
+        </section>
+
+        <!-- Projects Grid View Container -->
+        <section class="projects-grid" id="projects-grid">
+            <!-- Dynamically populated via admin.js -->
+        </section>
+
+        <!-- Projects Table View Container -->
+        <section class="projects-table-card" id="projects-table-card" style="display: none;">
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">Order</th>
+                        <th style="width: 80px;">Thumbnail</th>
+                        <th>Project Title &amp; Description</th>
+                        <th>Category</th>
+                        <th>Links</th>
+                        <th style="width: 170px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="projects-table-body">
+                    <!-- Populated via admin.js -->
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- ----------------- ADD / EDIT PROJECT MODAL ----------------- -->
+    <div class="modal-overlay" id="project-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">
+                    <i class='bx bx-plus-circle'></i> Add New Project
+                </div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="project-form">
+                    <div class="split-modal-content">
+                        
+                        <!-- Form Fields Column -->
+                        <div class="form-fields-col">
+                            
+                            <!-- Project Title -->
+                            <div class="form-group">
+                                <label class="form-label" for="proj-title">Project Title <span class="req">*</span></label>
+                                <input type="text" id="proj-title" class="form-control" placeholder="e.g. AI-Powered Smart Inventory System" required>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="form-group">
+                                <label class="form-label" for="proj-category">Category / Domain <span class="req">*</span></label>
+                                <input type="text" id="proj-category" class="form-control" list="category-suggestions" placeholder="e.g. Full Stack / Web Dev">
+                                <datalist id="category-suggestions">
+                                    <option value="Full Stack / Web Dev">
+                                    <option value="Cloud &amp; DevOps">
+                                    <option value="AI &amp; Machine Learning">
+                                    <option value="Mobile App">
+                                    <option value="Web Dev &amp; Database">
+                                    <option value="Desktop Application">
+                                    <option value="UI/UX Design">
+                                </datalist>
+                            </div>
+
+                            <!-- Image Picker -->
+                            <div class="form-group">
+                                <label class="form-label">Project Image / Thumbnail <span class="req">*</span></label>
+                                
+                                <div class="image-picker-tabs">
+                                    <button type="button" class="img-tab-btn active" data-tab="presets" onclick="switchImageTab('presets')">
+                                        <i class='bx bx-images'></i> Existing Images
+                                    </button>
+                                    <button type="button" class="img-tab-btn" data-tab="upload" onclick="switchImageTab('upload')">
+                                        <i class='bx bx-upload'></i> Upload File
+                                    </button>
+                                    <button type="button" class="img-tab-btn" data-tab="url" onclick="switchImageTab('url')">
+                                        <i class='bx bx-link'></i> Path / URL
+                                    </button>
+                                </div>
+
+                                <!-- Preset images tab -->
+                                <div id="tab-presets">
+                                    <div class="image-preset-grid" id="preset-image-grid">
+                                        <!-- Loaded dynamically -->
+                                    </div>
+                                </div>
+
+                                <!-- Upload file tab -->
+                                <div id="tab-upload" style="display: none;">
+                                    <input type="file" id="proj-file-upload" accept="image/*" style="display: none;">
+                                    <div class="file-upload-dropzone" id="upload-dropzone">
+                                        <i class='bx bx-cloud-upload'></i>
+                                        <p><strong>Click to browse</strong> or drag &amp; drop an image here</p>
+                                        <p style="font-size: 11px; margin-top: 4px;">PNG, JPG, WebP supported</p>
+                                    </div>
+                                </div>
+
+                                <!-- Custom URL tab -->
+                                <div id="tab-url" style="display: none;">
+                                    <input type="text" id="proj-image-path" class="form-control" placeholder="images/your-image.png or https://...">
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group">
+                                <label class="form-label" for="proj-description">Description (Appears on hover overlay) <span class="req">*</span></label>
+                                <textarea id="proj-description" class="form-control" placeholder="Briefly describe what this project does, tech stack, and notable accomplishments..." required></textarea>
+                            </div>
+
+                            <!-- Links Section -->
+                            <div class="links-section">
+                                <div class="links-section-title">
+                                    <i class='bx bx-link-alt'></i> Project Action Links
+                                </div>
+
+                                <!-- Primary GitHub -->
+                                <div class="form-group" style="margin-bottom: 12px;">
+                                    <label class="form-label" style="font-size: 12px;">GitHub Repository URL</label>
+                                    <input type="url" id="link-gh1" class="form-control" placeholder="https://github.com/Ehashan/repo-name">
+                                </div>
+
+                                <!-- Secondary GitHub (Backend / Extra) -->
+                                <div class="form-group" style="margin-bottom: 12px;">
+                                    <label class="form-label" style="font-size: 12px;">GitHub Backend URL <span class="opt">(Optional, for split fullstack)</span></label>
+                                    <input type="url" id="link-gh2" class="form-control" placeholder="https://github.com/Ehashan/backend-repo">
+                                </div>
+
+                                <!-- Live Demo -->
+                                <div class="form-group" style="margin-bottom: 12px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <label class="form-label" style="font-size: 12px; margin: 0;">Live Demo URL</label>
+                                        <label style="font-size: 12px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                            <input type="checkbox" id="link-demo-disabled"> Mark Coming Soon / In Progress
+                                        </label>
+                                    </div>
+                                    <input type="url" id="link-demo" class="form-control" placeholder="https://my-app.vercel.app/">
+                                </div>
+
+                                <!-- Custom Extra Link -->
+                                <div class="link-input-row" style="margin-bottom: 0;">
+                                    <input type="text" id="link-custom-label" class="form-control" placeholder="Custom Label (e.g. YouTube)">
+                                    <input type="url" id="link-custom-url" class="form-control" placeholder="URL (e.g. Video demo, docs)">
+                                    <span style="font-size: 11px; color: var(--text-muted);">Optional</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Real-time Interactive Live Preview Column -->
+                        <div class="live-preview-panel">
+                            <div class="preview-header">
+                                <span class="preview-title"><i class='bx bx-show'></i> Real-Time Live Preview</span>
+                                <span style="font-size: 11px; color: var(--text-muted);">Hover to test overlay</span>
+                            </div>
+
+                            <div class="preview-stage">
+                                <div id="live-preview-box">
+                                    <!-- Populated dynamically via updateLivePreview() -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer" style="margin: 20px -24px -24px -24px;">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <i class='bx bx-check-circle'></i> Save Project
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ----------------- EXPORT & SYNC MODAL ----------------- -->
+    <div class="modal-overlay" id="export-modal">
+        <div class="modal-container" style="max-width: 820px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class='bx bx-cloud-download'></i> Export &amp; Publish Hub
+                </div>
+                <button class="modal-close" onclick="closeExportModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+                    Your changes are immediately active in your browser. Use the options below to sync changes with your repository or download updated files for permanent GitHub Pages deployment.
+                </p>
+
+                <div class="export-tabs">
+                    <button class="export-tab-btn active" data-tab="js" onclick="switchExportTab('js')">
+                        <i class='bx bxl-javascript'></i> Download projects.js
+                    </button>
+                    <button class="export-tab-btn" data-tab="html" onclick="switchExportTab('html')">
+                        <i class='bx bxl-html5'></i> Static HTML Snippet
+                    </button>
+                    <button class="export-tab-btn" data-tab="github" onclick="switchExportTab('github')">
+                        <i class='bx bxl-github'></i> GitHub 1-Click Commit
+                    </button>
+                    <button class="export-tab-btn" data-tab="json" onclick="switchExportTab('json')">
+                        <i class='bx bx-data'></i> JSON Backup
+                    </button>
+                </div>
+
+                <!-- Tab 1: projects.js -->
+                <div id="export-tab-js">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 13px; color: var(--text-muted);">
+                            Download and replace <code>projects.js</code> in your portfolio root folder:
+                        </span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="copyToClipboard('export-js-preview', 'projects.js code copied!')">
+                                <i class='bx bx-copy'></i> Copy Code
+                            </button>
+                            <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="downloadProjectsJsFile()">
+                                <i class='bx bx-download'></i> Download projects.js
+                            </button>
+                        </div>
+                    </div>
+                    <div class="code-preview-box">
+                        <pre id="export-js-preview"></pre>
+                    </div>
+                </div>
+
+                <!-- Tab 2: HTML snippet -->
+                <div id="export-tab-html" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 13px; color: var(--text-muted);">
+                            Copy static HTML to paste into <code>index.html</code> inside <code>.portfolio-container</code>:
+                        </span>
+                        <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="copyToClipboard('export-html-preview', 'HTML snippet copied!')">
+                            <i class='bx bx-copy'></i> Copy HTML
+                        </button>
+                    </div>
+                    <div class="code-preview-box">
+                        <pre id="export-html-preview"></pre>
+                    </div>
+                </div>
+
+                <!-- Tab 3: GitHub Direct Sync -->
+                <div id="export-tab-github" style="display: none;">
+                    <div style="background: var(--second-color); border-radius: 8px; padding: 18px; margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--main-color); margin-bottom: 6px;">
+                            <i class='bx bx-sync'></i> Direct Commit via GitHub API
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+                            Provide a GitHub Personal Access Token (classic with <code>repo</code> scope) to commit <code>projects.js</code> directly to your repository without opening a terminal!
+                        </p>
+
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label" style="font-size: 12px;">GitHub Personal Access Token (PAT)</label>
+                            <input type="password" id="gh-token" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                            <div>
+                                <label class="form-label" style="font-size: 12px;">Repository (owner/repo)</label>
+                                <input type="text" id="gh-repo" class="form-control" value="Ehashan/My-Portfolio-">
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size: 12px;">Target Branch</label>
+                                <input type="text" id="gh-branch" class="form-control" value="dev">
+                            </div>
+                        </div>
+
+                        <button class="btn-primary" onclick="syncToGitHub()">
+                            <i class='bx bx-cloud-upload'></i> Commit &amp; Sync to GitHub
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab 4: JSON Backup -->
+                <div id="export-tab-json" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 13px; color: var(--text-muted);">JSON Data for backup and restore:</span>
+                        <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="copyToClipboard('export-json-preview', 'JSON data copied!')">
+                            <i class='bx bx-copy'></i> Copy JSON
+                        </button>
+                    </div>
+                    <div class="code-preview-box">
+                        <pre id="export-json-preview"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeExportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ----------------- SETTINGS MODAL ----------------- -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-container" style="max-width: 480px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class='bx bx-cog'></i> Admin Settings
+                </div>
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form onsubmit="handleUpdatePin(event)">
+                    <h4 style="font-size: 15px; margin-bottom: 14px; color: var(--main-color);">Change Passcode</h4>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="current-pin">Current Passcode</label>
+                        <input type="password" id="current-pin" class="form-control" required placeholder="Enter current passcode">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="new-pin">New Passcode</label>
+                        <input type="password" id="new-pin" class="form-control" required minlength="4" placeholder="Min 4 characters">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="confirm-pin">Confirm New Passcode</label>
+                        <input type="password" id="confirm-pin" class="form-control" required minlength="4" placeholder="Re-enter new passcode">
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Update Passcode</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ----------------- TOAST CONTAINER ----------------- -->
+    <div id="toast-container"></div>
+
+    <!-- ----------------- FOOTER ----------------- -->
+    <footer class="admin-footer">
+        &copy; 2026 Eranda Hashan | Portfolio Admin Management System &bull; <a href="index.html">Back to Portfolio</a>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="projects.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
