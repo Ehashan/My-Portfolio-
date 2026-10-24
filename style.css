@@ -521,6 +521,31 @@ span {
     font-size: 1.8rem;
 }
 
+.project-btn.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    border-color: #555;
+    color: #888;
+}
+
+.footer-admin-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: #6b7280;
+    font-size: 1.3rem;
+    transition: .3s;
+    margin-left: 1.5rem;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+.footer-admin-link:hover {
+    color: var(--main-color);
+}
+
+
 .contact h2 {
     margin-bottom: 3rem;
 }

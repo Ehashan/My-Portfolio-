@@ -37,6 +37,12 @@ window.onscroll = () => {
     navbar.classList.remove('active');
 };
 
+/*  RENDER DYNAMIC PORTFOLIO PROJECTS  */
+const portfolioContainer = document.querySelector('.portfolio-container');
+if (portfolioContainer && window.PortfolioManager) {
+    window.PortfolioManager.renderToContainer(portfolioContainer);
+}
+
 /* SCROLL REVEAL  */
 ScrollReveal({
     distance: '80px',
