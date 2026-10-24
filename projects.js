@@ -124,29 +124,108 @@ const PortfolioManager = {
         return [...DEFAULT_PROJECTS];
     },
 
-    // Generate single portfolio-box HTML
+    // Sanitize URLs to prevent javascript: or malformed URLs
+    sanitizeUrl(url) {
+        if (!url) return '#';
+        const trimmed = String(url).trim();
+        if (
+            trimmed.startsWith('images/') ||
+            trimmed.startsWith('./') ||
+            trimmed.startsWith('/') ||
+            trimmed.startsWith('data:image/') ||
+            trimmed.startsWith('http://') ||
+            trimmed.startsWith('https://') ||
+            trimmed.startsWith('mailto:') ||
+            trimmed === '#'
+        ) {
+            return trimmed;
+        }
+        return '#';
+    },
+
+    // Create safe DOM element (avoids innerHTML / XSS / CodeQL warnings)
+    createProjectCardElement(project) {
+        const box = document.createElement('div');
+        box.className = 'portfolio-box';
+        if (project.id) box.dataset.id = project.id;
+
+        // Project Title
+        const title = document.createElement('h4');
+        title.className = 'project-name';
+        title.textContent = project.title || 'Portfolio Project';
+        box.appendChild(title);
+
+        // Image Wrapper
+        const imgWrapper = document.createElement('div');
+        imgWrapper.className = 'project-image-wrapper';
+
+        const img = document.createElement('img');
+        img.src = this.sanitizeUrl(project.image || 'images/portfolio.png');
+        img.alt = project.title || 'Project Preview';
+        img.onerror = () => { img.src = 'images/portfolio.png'; };
+        imgWrapper.appendChild(img);
+
+        // Hover Overlay
+        const layer = document.createElement('div');
+        layer.className = 'portfolio-layer';
+        const desc = document.createElement('p');
+        desc.textContent = project.description || '';
+        layer.appendChild(desc);
+        imgWrapper.appendChild(layer);
+        box.appendChild(imgWrapper);
+
+        // Buttons
+        const btnContainer = document.createElement('div');
+        btnContainer.className = 'project-buttons';
+
+        (project.links || []).forEach(link => {
+            const a = document.createElement('a');
+            const safeUrl = this.sanitizeUrl(link.url);
+            const isDisabled = link.disabled || safeUrl === '#';
+
+            a.href = safeUrl;
+            a.className = 'project-btn' + (isDisabled ? ' disabled' : '');
+            if (!isDisabled) {
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+            }
+            a.setAttribute('aria-label', link.label || 'Project Link');
+
+            const icon = document.createElement('i');
+            icon.className = link.icon || 'bx bx-link';
+            a.appendChild(icon);
+            a.appendChild(document.createTextNode(' ' + (link.label || 'Link')));
+            btnContainer.appendChild(a);
+        });
+
+        box.appendChild(btnContainer);
+        return box;
+    },
+
+    // Generate single portfolio-box HTML (for static export code)
     renderProjectCardHTML(project) {
+        const safeImage = this.sanitizeUrl(project.image || 'images/portfolio.png');
         const linksHTML = (project.links || []).map(link => {
-            const isDisabled = link.disabled || link.url === '#' || !link.url;
+            const safeUrl = this.sanitizeUrl(link.url);
+            const isDisabled = link.disabled || safeUrl === '#';
             const disabledClass = isDisabled ? ' disabled' : '';
             const targetAttr = isDisabled ? '' : ' target="_blank" rel="noopener noreferrer"';
-            const iconClass = link.icon || 'bx bx-link';
+            const iconClass = this.escapeHTML(link.icon || 'bx bx-link');
+            const labelText = this.escapeHTML(link.label || 'Link');
             return `
-                <a href="${link.url || '#'}"${targetAttr} class="project-btn${disabledClass}" aria-label="${link.label}">
-                    <i class='${iconClass}'></i> ${link.label}
+                <a href="${safeUrl}"${targetAttr} class="project-btn${disabledClass}" aria-label="${labelText}">
+                    <i class='${iconClass}'></i> ${labelText}
                 </a>
             `;
         }).join('');
 
-        const imageSrc = project.image || 'images/portfolio.png';
-
         return `
-            <div class="portfolio-box" data-id="${project.id}">
-                <h4 class="project-name">${this.escapeHTML(project.title)}</h4>
+            <div class="portfolio-box" data-id="${this.escapeHTML(project.id || '')}">
+                <h4 class="project-name">${this.escapeHTML(project.title || '')}</h4>
                 <div class="project-image-wrapper">
-                    <img src="${imageSrc}" alt="${this.escapeHTML(project.title)}" onerror="this.src='images/portfolio.png'">
+                    <img src="${safeImage}" alt="${this.escapeHTML(project.title || '')}" onerror="this.src='images/portfolio.png'">
                     <div class="portfolio-layer">
-                        <p>${this.escapeHTML(project.description)}</p>
+                        <p>${this.escapeHTML(project.description || '')}</p>
                     </div>
                 </div>
                 <div class="project-buttons">
@@ -159,7 +238,7 @@ const PortfolioManager = {
     // Helper to safely escape HTML
     escapeHTML(str) {
         if (!str) return '';
-        return str
+        return String(str)
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -167,12 +246,11 @@ const PortfolioManager = {
             .replace(/'/g, "&#039;");
     },
 
-    // Render all projects into container
+    // Render all projects into container safely using DOM nodes
     renderToContainer(containerElement) {
         if (!containerElement) return;
         const projects = this.getProjects();
-        const html = projects.map(p => this.renderProjectCardHTML(p)).join('\n\n');
-        containerElement.innerHTML = html;
+        containerElement.replaceChildren(...projects.map(p => this.createProjectCardElement(p)));
     }
 };
 

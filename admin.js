@@ -193,7 +193,12 @@ function updateCategoryFilterDropdown() {
     const categories = Array.from(new Set(projects.map(p => p.category).filter(Boolean)));
     const selectedVal = categoryFilter.value || 'all';
 
-    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+    categoryFilter.replaceChildren();
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = 'all';
+    defaultOpt.textContent = 'All Categories';
+    categoryFilter.appendChild(defaultOpt);
+
     categories.forEach(cat => {
         const opt = document.createElement('option');
         opt.value = cat;
@@ -219,119 +224,293 @@ function renderProjectList() {
     });
 
     if (filtered.length === 0) {
-        const emptyHTML = `
-            <div class="empty-state">
-                <i class='bx bx-folder-open'></i>
-                <h3>No Projects Found</h3>
-                <p>No projects match your current search or category filter.</p>
-                <button class="btn-primary" onclick="openAddModal()">
-                    <i class='bx bx-plus'></i> Add New Project
-                </button>
-            </div>
-        `;
-        projectsGrid.innerHTML = emptyHTML;
-        projectsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">No matching projects found</td></tr>`;
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        
+        const emptyIcon = document.createElement('i');
+        emptyIcon.className = 'bx bx-folder-open';
+        const emptyH3 = document.createElement('h3');
+        emptyH3.textContent = 'No Projects Found';
+        const emptyP = document.createElement('p');
+        emptyP.textContent = 'No projects match your current search or category filter.';
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn-primary';
+        addBtn.onclick = () => openAddModal();
+        const plusIcon = document.createElement('i');
+        plusIcon.className = 'bx bx-plus';
+        addBtn.append(plusIcon, document.createTextNode(' Add New Project'));
+
+        emptyState.append(emptyIcon, emptyH3, emptyP, addBtn);
+        projectsGrid.replaceChildren(emptyState);
+
+        const emptyTr = document.createElement('tr');
+        const emptyTd = document.createElement('td');
+        emptyTd.colSpan = 6;
+        emptyTd.style.textAlign = 'center';
+        emptyTd.style.padding = '40px';
+        emptyTd.style.color = 'var(--text-muted)';
+        emptyTd.textContent = 'No matching projects found';
+        emptyTr.appendChild(emptyTd);
+        projectsTableBody.replaceChildren(emptyTr);
         return;
     }
 
-    // Grid View Render
-    projectsGrid.innerHTML = filtered.map((p, index) => {
+    // Grid View Render using Safe DOM Nodes
+    const gridCards = filtered.map(p => {
         const fullIndex = projects.findIndex(item => item.id === p.id);
         const isFirst = fullIndex === 0;
         const isLast = fullIndex === projects.length - 1;
+        return createAdminProjectCardElement(p, fullIndex, isFirst, isLast);
+    });
+    projectsGrid.replaceChildren(...gridCards);
 
-        const linksPills = (p.links || []).map(link => {
-            const isDisabled = link.disabled || link.url === '#' || !link.url;
-            return `<span class="link-pill${isDisabled ? ' disabled' : ''}"><i class='${link.icon || 'bx bx-link'}'></i> ${link.label}</span>`;
-        }).join('');
-
-        return `
-            <div class="admin-project-card" data-id="${p.id}">
-                <div class="card-header-bar">
-                    <span class="card-category-tag"><i class='bx bx-tag-alt'></i> ${escapeHtml(p.category || 'General')}</span>
-                    <span class="card-order-badge">#${fullIndex + 1}</span>
-                </div>
-                <div class="card-thumb-wrapper">
-                    <img src="${p.image || 'images/portfolio.png'}" alt="${escapeHtml(p.title)}" onerror="this.src='images/portfolio.png'">
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">${escapeHtml(p.title)}</h3>
-                    <p class="card-description">${escapeHtml(p.description)}</p>
-                    <div class="card-links-preview">${linksPills}</div>
-                    
-                    <div class="card-actions-bar">
-                        <div class="reorder-btns">
-                            <button class="btn-move" title="Move Up" onclick="moveProject('${p.id}', -1)" ${isFirst ? 'disabled' : ''}>
-                                <i class='bx bx-up-arrow-alt'></i>
-                            </button>
-                            <button class="btn-move" title="Move Down" onclick="moveProject('${p.id}', 1)" ${isLast ? 'disabled' : ''}>
-                                <i class='bx bx-down-arrow-alt'></i>
-                            </button>
-                        </div>
-                        <div class="edit-delete-btns">
-                            <button class="btn-dup" title="Duplicate" onclick="duplicateProject('${p.id}')">
-                                <i class='bx bx-copy'></i>
-                            </button>
-                            <button class="btn-edit" title="Edit" onclick="openEditModal('${p.id}')">
-                                <i class='bx bx-edit-alt'></i> Edit
-                            </button>
-                            <button class="btn-del" title="Delete" onclick="deleteProject('${p.id}')">
-                                <i class='bx bx-trash'></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Table View Render
-    projectsTableBody.innerHTML = filtered.map((p, index) => {
+    // Table View Render using Safe DOM Nodes
+    const tableRows = filtered.map(p => {
         const fullIndex = projects.findIndex(item => item.id === p.id);
         const isFirst = fullIndex === 0;
         const isLast = fullIndex === projects.length - 1;
-        const linkCount = (p.links || []).filter(l => l.url && l.url !== '#').length;
+        return createAdminTableRowElement(p, fullIndex, isFirst, isLast);
+    });
+    projectsTableBody.replaceChildren(...tableRows);
+}
 
-        return `
-            <tr>
-                <td style="font-weight: 600; color: var(--main-color);">#${fullIndex + 1}</td>
-                <td>
-                    <img src="${p.image || 'images/portfolio.png'}" alt="${escapeHtml(p.title)}" class="table-thumb" onerror="this.src='images/portfolio.png'">
-                </td>
-                <td>
-                    <div style="font-weight: 600; color: #fff;">${escapeHtml(p.title)}</div>
-                    <div style="font-size: 12px; color: var(--text-muted); max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        ${escapeHtml(p.description)}
-                    </div>
-                </td>
-                <td>
-                    <span class="badge-dev" style="font-size: 11px;">${escapeHtml(p.category || 'General')}</span>
-                </td>
-                <td>
-                    <span style="font-size: 13px; color: var(--text-muted);">${linkCount} active link(s)</span>
-                </td>
-                <td>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <button class="btn-move" onclick="moveProject('${p.id}', -1)" ${isFirst ? 'disabled' : ''}><i class='bx bx-up-arrow-alt'></i></button>
-                        <button class="btn-move" onclick="moveProject('${p.id}', 1)" ${isLast ? 'disabled' : ''}><i class='bx bx-down-arrow-alt'></i></button>
-                        <button class="btn-edit" onclick="openEditModal('${p.id}')"><i class='bx bx-edit-alt'></i></button>
-                        <button class="btn-del" onclick="deleteProject('${p.id}')"><i class='bx bx-trash'></i></button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
+function createAdminProjectCardElement(p, fullIndex, isFirst, isLast) {
+    const card = document.createElement('div');
+    card.className = 'admin-project-card';
+    card.dataset.id = p.id;
+
+    // Header bar
+    const header = document.createElement('div');
+    header.className = 'card-header-bar';
+
+    const catTag = document.createElement('span');
+    catTag.className = 'card-category-tag';
+    const tagIcon = document.createElement('i');
+    tagIcon.className = 'bx bx-tag-alt';
+    catTag.append(tagIcon, document.createTextNode(' ' + (p.category || 'General')));
+
+    const orderBadge = document.createElement('span');
+    orderBadge.className = 'card-order-badge';
+    orderBadge.textContent = `#${fullIndex + 1}`;
+
+    header.append(catTag, orderBadge);
+    card.appendChild(header);
+
+    // Thumbnail wrapper
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = 'card-thumb-wrapper';
+    const img = document.createElement('img');
+    img.src = window.PortfolioManager ? window.PortfolioManager.sanitizeUrl(p.image) : (p.image || 'images/portfolio.png');
+    img.alt = p.title || '';
+    img.onerror = () => { img.src = 'images/portfolio.png'; };
+    thumbWrap.appendChild(img);
+    card.appendChild(thumbWrap);
+
+    // Card Body
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    const title = document.createElement('h3');
+    title.className = 'card-title';
+    title.textContent = p.title || '';
+    body.appendChild(title);
+
+    const desc = document.createElement('p');
+    desc.className = 'card-description';
+    desc.textContent = p.description || '';
+    body.appendChild(desc);
+
+    // Links preview
+    const linksPreview = document.createElement('div');
+    linksPreview.className = 'card-links-preview';
+    (p.links || []).forEach(link => {
+        const pill = document.createElement('span');
+        const safeUrl = window.PortfolioManager ? window.PortfolioManager.sanitizeUrl(link.url) : link.url;
+        const isDisabled = link.disabled || safeUrl === '#';
+        pill.className = 'link-pill' + (isDisabled ? ' disabled' : '');
+        const icon = document.createElement('i');
+        icon.className = link.icon || 'bx bx-link';
+        pill.append(icon, document.createTextNode(' ' + (link.label || '')));
+        linksPreview.appendChild(pill);
+    });
+    body.appendChild(linksPreview);
+
+    // Actions bar
+    const actionsBar = document.createElement('div');
+    actionsBar.className = 'card-actions-bar';
+
+    const reorderBtns = document.createElement('div');
+    reorderBtns.className = 'reorder-btns';
+
+    const btnUp = document.createElement('button');
+    btnUp.className = 'btn-move';
+    btnUp.title = 'Move Up';
+    btnUp.disabled = isFirst;
+    btnUp.onclick = () => moveProject(p.id, -1);
+    const iconUp = document.createElement('i');
+    iconUp.className = 'bx bx-up-arrow-alt';
+    btnUp.appendChild(iconUp);
+
+    const btnDown = document.createElement('button');
+    btnDown.className = 'btn-move';
+    btnDown.title = 'Move Down';
+    btnDown.disabled = isLast;
+    btnDown.onclick = () => moveProject(p.id, 1);
+    const iconDown = document.createElement('i');
+    iconDown.className = 'bx bx-down-arrow-alt';
+    btnDown.appendChild(iconDown);
+
+    reorderBtns.append(btnUp, btnDown);
+    actionsBar.appendChild(reorderBtns);
+
+    const editDelBtns = document.createElement('div');
+    editDelBtns.className = 'edit-delete-btns';
+
+    const btnDup = document.createElement('button');
+    btnDup.className = 'btn-dup';
+    btnDup.title = 'Duplicate';
+    btnDup.onclick = () => duplicateProject(p.id);
+    const iconDup = document.createElement('i');
+    iconDup.className = 'bx bx-copy';
+    btnDup.appendChild(iconDup);
+
+    const btnEdit = document.createElement('button');
+    btnEdit.className = 'btn-edit';
+    btnEdit.title = 'Edit';
+    btnEdit.onclick = () => openEditModal(p.id);
+    const iconEdit = document.createElement('i');
+    iconEdit.className = 'bx bx-edit-alt';
+    btnEdit.append(iconEdit, document.createTextNode(' Edit'));
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn-del';
+    btnDel.title = 'Delete';
+    btnDel.onclick = () => deleteProject(p.id);
+    const iconDel = document.createElement('i');
+    iconDel.className = 'bx bx-trash';
+    btnDel.appendChild(iconDel);
+
+    editDelBtns.append(btnDup, btnEdit, btnDel);
+    actionsBar.appendChild(editDelBtns);
+
+    body.appendChild(actionsBar);
+    card.appendChild(body);
+    return card;
+}
+
+function createAdminTableRowElement(p, fullIndex, isFirst, isLast) {
+    const tr = document.createElement('tr');
+
+    const tdIndex = document.createElement('td');
+    tdIndex.style.fontWeight = '600';
+    tdIndex.style.color = 'var(--main-color)';
+    tdIndex.textContent = `#${fullIndex + 1}`;
+    tr.appendChild(tdIndex);
+
+    const tdThumb = document.createElement('td');
+    const thumbImg = document.createElement('img');
+    thumbImg.className = 'table-thumb';
+    thumbImg.src = window.PortfolioManager ? window.PortfolioManager.sanitizeUrl(p.image) : (p.image || 'images/portfolio.png');
+    thumbImg.alt = p.title || '';
+    thumbImg.onerror = () => { thumbImg.src = 'images/portfolio.png'; };
+    tdThumb.appendChild(thumbImg);
+    tr.appendChild(tdThumb);
+
+    const tdInfo = document.createElement('td');
+    const divTitle = document.createElement('div');
+    divTitle.style.fontWeight = '600';
+    divTitle.style.color = '#fff';
+    divTitle.textContent = p.title || '';
+    const divDesc = document.createElement('div');
+    divDesc.style.fontSize = '12px';
+    divDesc.style.color = 'var(--text-muted)';
+    divDesc.style.maxWidth = '320px';
+    divDesc.style.whiteSpace = 'nowrap';
+    divDesc.style.overflow = 'hidden';
+    divDesc.style.textOverflow = 'ellipsis';
+    divDesc.textContent = p.description || '';
+    tdInfo.append(divTitle, divDesc);
+    tr.appendChild(tdInfo);
+
+    const tdCat = document.createElement('td');
+    const catBadge = document.createElement('span');
+    catBadge.className = 'badge-dev';
+    catBadge.style.fontSize = '11px';
+    catBadge.textContent = p.category || 'General';
+    tdCat.appendChild(catBadge);
+    tr.appendChild(tdCat);
+
+    const tdLinks = document.createElement('td');
+    const activeLinksCount = (p.links || []).filter(l => l.url && l.url !== '#').length;
+    const spanLinks = document.createElement('span');
+    spanLinks.style.fontSize = '13px';
+    spanLinks.style.color = 'var(--text-muted)';
+    spanLinks.textContent = `${activeLinksCount} active link(s)`;
+    tdLinks.appendChild(spanLinks);
+    tr.appendChild(tdLinks);
+
+    const tdActions = document.createElement('td');
+    const divActions = document.createElement('div');
+    divActions.style.display = 'flex';
+    divActions.style.gap = '6px';
+    divActions.style.alignItems = 'center';
+
+    const btnUp = document.createElement('button');
+    btnUp.className = 'btn-move';
+    btnUp.disabled = isFirst;
+    btnUp.onclick = () => moveProject(p.id, -1);
+    const iconUp = document.createElement('i');
+    iconUp.className = 'bx bx-up-arrow-alt';
+    btnUp.appendChild(iconUp);
+
+    const btnDown = document.createElement('button');
+    btnDown.className = 'btn-move';
+    btnDown.disabled = isLast;
+    btnDown.onclick = () => moveProject(p.id, 1);
+    const iconDown = document.createElement('i');
+    iconDown.className = 'bx bx-down-arrow-alt';
+    btnDown.appendChild(iconDown);
+
+    const btnEdit = document.createElement('button');
+    btnEdit.className = 'btn-edit';
+    btnEdit.onclick = () => openEditModal(p.id);
+    const iconEdit = document.createElement('i');
+    iconEdit.className = 'bx bx-edit-alt';
+    btnEdit.appendChild(iconEdit);
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn-del';
+    btnDel.onclick = () => deleteProject(p.id);
+    const iconDel = document.createElement('i');
+    iconDel.className = 'bx bx-trash';
+    btnDel.appendChild(iconDel);
+
+    divActions.append(btnUp, btnDown, btnEdit, btnDel);
+    tdActions.appendChild(divActions);
+    tr.appendChild(tdActions);
+
+    return tr;
 }
 
 /**
  * Preset Images Grid
  */
 function populatePresetImages() {
-    presetGrid.innerHTML = PRESET_IMAGES.map(img => `
-        <div class="preset-thumb" data-path="${img.path}" onclick="selectPresetImage('${img.path}')" title="${img.name}">
-            <img src="${img.path}" alt="${img.name}" onerror="this.src='images/portfolio.png'">
-        </div>
-    `).join('');
+    const thumbs = PRESET_IMAGES.map(img => {
+        const div = document.createElement('div');
+        div.className = 'preset-thumb';
+        div.dataset.path = img.path;
+        div.title = img.name;
+        div.onclick = () => selectPresetImage(img.path);
+
+        const imgEl = document.createElement('img');
+        imgEl.src = img.path;
+        imgEl.alt = img.name;
+        imgEl.onerror = () => { imgEl.src = 'images/portfolio.png'; };
+        div.appendChild(imgEl);
+        return div;
+    });
+    presetGrid.replaceChildren(...thumbs);
 }
 
 function selectPresetImage(path) {
@@ -421,9 +600,17 @@ function getFormProjectData() {
 
 function updateLivePreview() {
     const tempProj = getFormProjectData();
-    if (window.PortfolioManager) {
-        previewBox.innerHTML = window.PortfolioManager.renderProjectCardHTML(tempProj);
+    previewBox.replaceChildren();
+    if (window.PortfolioManager && window.PortfolioManager.createProjectCardElement) {
+        previewBox.appendChild(window.PortfolioManager.createProjectCardElement(tempProj));
     }
+}
+
+function setModalTitle(iconClass, titleText) {
+    modalTitle.replaceChildren();
+    const icon = document.createElement('i');
+    icon.className = iconClass;
+    modalTitle.append(icon, document.createTextNode(' ' + titleText));
 }
 
 /**
@@ -431,7 +618,7 @@ function updateLivePreview() {
  */
 function openAddModal() {
     editingProjectId = null;
-    modalTitle.innerHTML = `<i class='bx bx-plus-circle'></i> Add New Project`;
+    setModalTitle('bx bx-plus-circle', 'Add New Project');
     projectForm.reset();
     inputImagePath.value = 'images/portfolio.png';
     linkDemoDisabled.checked = false;
@@ -449,7 +636,7 @@ function openEditModal(projectId) {
     if (!proj) return;
 
     editingProjectId = projectId;
-    modalTitle.innerHTML = `<i class='bx bx-edit-alt'></i> Edit Project`;
+    setModalTitle('bx bx-edit-alt', 'Edit Project');
 
     inputTitle.value = proj.title || '';
     inputCategory.value = proj.category || 'Web Dev';
@@ -702,28 +889,99 @@ const PortfolioManager = {
         localStorage.removeItem(STORAGE_KEY);
         return [...DEFAULT_PROJECTS];
     },
+    sanitizeUrl(url) {
+        if (!url) return '#';
+        const trimmed = String(url).trim();
+        if (
+            trimmed.startsWith('images/') ||
+            trimmed.startsWith('./') ||
+            trimmed.startsWith('/') ||
+            trimmed.startsWith('data:image/') ||
+            trimmed.startsWith('http://') ||
+            trimmed.startsWith('https://') ||
+            trimmed.startsWith('mailto:') ||
+            trimmed === '#'
+        ) {
+            return trimmed;
+        }
+        return '#';
+    },
+    createProjectCardElement(project) {
+        const box = document.createElement('div');
+        box.className = 'portfolio-box';
+        if (project.id) box.dataset.id = project.id;
+
+        const title = document.createElement('h4');
+        title.className = 'project-name';
+        title.textContent = project.title || 'Portfolio Project';
+        box.appendChild(title);
+
+        const imgWrapper = document.createElement('div');
+        imgWrapper.className = 'project-image-wrapper';
+
+        const img = document.createElement('img');
+        img.src = this.sanitizeUrl(project.image || 'images/portfolio.png');
+        img.alt = project.title || 'Project Preview';
+        img.onerror = () => { img.src = 'images/portfolio.png'; };
+        imgWrapper.appendChild(img);
+
+        const layer = document.createElement('div');
+        layer.className = 'portfolio-layer';
+        const desc = document.createElement('p');
+        desc.textContent = project.description || '';
+        layer.appendChild(desc);
+        imgWrapper.appendChild(layer);
+        box.appendChild(imgWrapper);
+
+        const btnContainer = document.createElement('div');
+        btnContainer.className = 'project-buttons';
+
+        (project.links || []).forEach(link => {
+            const a = document.createElement('a');
+            const safeUrl = this.sanitizeUrl(link.url);
+            const isDisabled = link.disabled || safeUrl === '#';
+
+            a.href = safeUrl;
+            a.className = 'project-btn' + (isDisabled ? ' disabled' : '');
+            if (!isDisabled) {
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+            }
+            a.setAttribute('aria-label', link.label || 'Project Link');
+
+            const icon = document.createElement('i');
+            icon.className = link.icon || 'bx bx-link';
+            a.appendChild(icon);
+            a.appendChild(document.createTextNode(' ' + (link.label || 'Link')));
+            btnContainer.appendChild(a);
+        });
+
+        box.appendChild(btnContainer);
+        return box;
+    },
     renderProjectCardHTML(project) {
+        const safeImage = this.sanitizeUrl(project.image || 'images/portfolio.png');
         const linksHTML = (project.links || []).map(link => {
-            const isDisabled = link.disabled || link.url === '#' || !link.url;
+            const safeUrl = this.sanitizeUrl(link.url);
+            const isDisabled = link.disabled || safeUrl === '#';
             const disabledClass = isDisabled ? ' disabled' : '';
             const targetAttr = isDisabled ? '' : ' target="_blank" rel="noopener noreferrer"';
-            const iconClass = link.icon || 'bx bx-link';
+            const iconClass = this.escapeHTML(link.icon || 'bx bx-link');
+            const labelText = this.escapeHTML(link.label || 'Link');
             return \`
-                <a href="\${link.url || '#'}"\${targetAttr} class="project-btn\${disabledClass}" aria-label="\${link.label}">
-                    <i class='\${iconClass}'></i> \${link.label}
+                <a href="\${safeUrl}"\${targetAttr} class="project-btn\${disabledClass}" aria-label="\${labelText}">
+                    <i class='\${iconClass}'></i> \${labelText}
                 </a>
             \`;
         }).join('');
 
-        const imageSrc = project.image || 'images/portfolio.png';
-
         return \`
-            <div class="portfolio-box" data-id="\${project.id}">
-                <h4 class="project-name">\${this.escapeHTML(project.title)}</h4>
+            <div class="portfolio-box" data-id="\${this.escapeHTML(project.id || '')}">
+                <h4 class="project-name">\${this.escapeHTML(project.title || '')}</h4>
                 <div class="project-image-wrapper">
-                    <img src="\${imageSrc}" alt="\${this.escapeHTML(project.title)}" onerror="this.src='images/portfolio.png'">
+                    <img src="\${safeImage}" alt="\${this.escapeHTML(project.title || '')}" onerror="this.src='images/portfolio.png'">
                     <div class="portfolio-layer">
-                        <p>\${this.escapeHTML(project.description)}</p>
+                        <p>\${this.escapeHTML(project.description || '')}</p>
                     </div>
                 </div>
                 <div class="project-buttons">
@@ -734,7 +992,7 @@ const PortfolioManager = {
     },
     escapeHTML(str) {
         if (!str) return '';
-        return str
+        return String(str)
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -744,8 +1002,7 @@ const PortfolioManager = {
     renderToContainer(containerElement) {
         if (!containerElement) return;
         const projects = this.getProjects();
-        const html = projects.map(p => this.renderProjectCardHTML(p)).join('\\n\\n');
-        containerElement.innerHTML = html;
+        containerElement.replaceChildren(...projects.map(p => this.createProjectCardElement(p)));
     }
 };
 
@@ -927,7 +1184,12 @@ function showToast(message, type = 'info') {
     if (type === 'success') icon = 'bx bx-check-circle';
     if (type === 'error') icon = 'bx bx-error-circle';
 
-    toast.innerHTML = `<i class='${icon}'></i> <span>${message}</span>`;
+    toast.replaceChildren();
+    const iconEl = document.createElement('i');
+    iconEl.className = icon;
+    const spanEl = document.createElement('span');
+    spanEl.textContent = message;
+    toast.append(iconEl, spanEl);
     toastContainer.appendChild(toast);
 
     setTimeout(() => {
